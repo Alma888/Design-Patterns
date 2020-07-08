@@ -1,0 +1,101 @@
+简单工厂模式是工厂模式中最简单的一种，它在应对产品类别比较多的时候，往往是力不从心，因此就有了工厂方法模式的出现。本例在回答该问题的同时，详细的详解工厂方法模式的原理和实现方式。
+
+
+工厂方法模式的原理
+如果我们不想在工厂类中进行逻辑判断，程序可以为不同产品类提供不同的工厂，不同的工厂类和产不同的产品 —— 工厂方法模式
+当使用工厂方法设计模式时，对象调用者需要与具体的工厂类耦合。
+
+   作为抽象工厂模式的孪生兄弟，工厂方法模式定义了一个创建对象的接口，但由子类决定要实例化的类是哪一个，也就是说工厂方法模式让实例化推迟到子类。
+
+      工厂方法模式非常符合“开闭原则”，易扩展。当需要增加一个新的产品时，我们只需要增加一个具体的产品类和与之对应的具体工厂即可，无须修改原有系统。
+
+同时在工厂方法模式中用户只需要知道生产产品的具体工厂即可，无须关系产品的创建过程，甚至连具体的产品类名称都不需要知道。虽然他很好的符合了“开闭原则”，但是由于每新增一个新产品时就需要增加两个类，这样势必会导致系统的复杂度增加。其UML结构图：
+
+
+ 【工厂方法模式的参与者】
+     Product：抽象产品。所有的产品必须实现这个共同的接口，这样一来，
+                   使用这些产品的类既可以引用这个接口。而不是具体类 。
+     ConcreteProduct：具体产品。
+     Creator：抽象工厂。它实现了所有操纵产品的方法，但不实现工厂方法。
+                   Creator所有的子类都必须要实现factoryMethod()工厂方法。
+     ConcreteCreator：具体工厂。制造产品的实际工厂。它负责创建一个或
+            者多个具体产品，只有ConcreteCreator类知道如何创建这些产品。
+
+
+Java实现工厂方法模式的方式
+       工厂方法模式对简单工厂模式进行了抽象。有一个抽象的Factory类（可以是抽象类或是接口），这个类将不再负责具体的产品生产，而是只制定了一些规范（也就是声明一些抽象方法），具体的生产工作由其子类去完成。在这个模式中，工厂类和产品类往往可以依次对应。即一个抽象工厂对应一个抽象产品，一个具体工厂对应一个具体产品，这个具体的工厂就负责生产对应的产品。例如：一个生产汽车的工厂，它既可以是生产轿车，又可以生产卡车，那就先定义一个抽象的工厂类，然后再衍生出轿车工厂类和卡车工厂类，示例代码如下：
+
+abstract class AbstractAutoFactory{  //抽象汽车工厂
+    public abstract Auto createAuto();//创建一个汽车的抽象方法
+}
+
+//轿车工厂
+class CarFactory extends AbstractAutoFactory{
+    @Override
+    public Auto createAuto() {
+        return new Car();             //返回的是轿车
+    }
+}
+//卡车工厂
+class TruckFactory extends AbstractAutoFactory{
+    @Override
+    public Auto createAuto() {
+        return new Truck();          //返回的是卡车
+    }
+}
+
+
+    但需要创建汽车的时候，只需要调用抽象工厂AbstractAutoFactory 的 createAuto() 方法即可，JVM会利用多态的原理，创建特定类型的汽车，例如以下代码：
+AbstractAutoFactory factory1=new CarFactory();  //定义轿车工厂对象
+AbstractAutoFactory factory2=new TruckFactory();//定义卡车工厂对象
+factory1.createAuto();        //创造了轿车
+factory2.createAuto();        //创造了卡车
+
+
+在实际开发中，具体工厂对象的给定往往不是直接new的，而是通过其他渠道传递过来的，使用AbstractAutoFactory 的程序员也不需要知道他具体使用的是哪种工厂。
+
+
+【答案】：以下是以汽车为产品的工厂方法模式的实现示例：
+package Factory;
+//工厂方法模式
+
+
+//以下是以汽车为产品的工厂方法模式的实现示例：
+
+/* 车类 */
+abstract class Auto1{           //汽车的抽象类
+}
+class Car1 extends Auto1{        //轿车
+}
+class Truck1 extends Auto1{      //卡车
+}
+
+//抽象汽车工厂
+abstract class AbstractAutoFactory{
+    public abstract Auto createAuto();//创建一个汽车的抽象方法
+}
+//轿车工厂
+class CarFactory extends AbstractAutoFactory{
+    @Override
+    public Auto createAuto() {
+        return new Car();             //返回的是轿车
+    }
+}
+//卡车工厂
+class TruckFactory extends AbstractAutoFactory{
+    @Override
+    public Auto createAuto() {
+        return new Truck();          //返回的是卡车
+    }
+}
+
+public class Solution2 {
+    //主函数：
+    public static void main(String[] args) {
+        AbstractAutoFactory factory1=new CarFactory();  //定义轿车工厂对象
+        AbstractAutoFactory factory2=new TruckFactory();//定义卡车工厂对象
+        factory1.createAuto();        //创造了轿车
+        factory2.createAuto();        //创造了卡车
+    }
+}
+
